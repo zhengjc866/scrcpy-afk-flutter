@@ -1,4 +1,4 @@
-name: Build Scrcpy AFK APK (All-in-One)
+name: Build Scrcpy AFK APK
 
 on:
   push:
@@ -20,11 +20,1440 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Generate Full Flutter + Shizuku + Scrcpy Project & Build APK
+      - name: Create Flutter Project & Write Source Files
         run: |
+          rm -rf scrcpy_afk_build
           mkdir -p scrcpy_afk_build
           cd scrcpy_afk_build
           flutter create . --project-name scrcpy_afk --org com.example --platforms android
 
-          # 1. Write lib/main.dart
-          echo "aW1wb3J0ICdkYXJ0OmFzeW5jJzsKaW1wb3J0ICdwYWNrYWdlOmZsdXR0ZXIvbWF0ZXJpYWwuZGFydCc7CmltcG9ydCAncGFja2FnZTpmbHV0dGVyL3NlcnZpY2VzLmRhcnQnOwoKdm9pZCBtYWluKCkgewogIFdpZGdldHNGbHV0dGVyQmluZGluZy5lbnN1cmVJbml0aWFsaXplZCgpOwogIHJ1bkFwcChjb25zdCBTY3JjcHlBZmtBcHAoKSk7Cn0KCmNsYXNzIFNjcmNweUFma0FwcCBleHRlbmRzIFN0YXRlbGVzc1dpZGdldCB7CiAgY29uc3QgU2NyY3B5QWZrQXBwKHtzdXBlci5rZXl9KTsKCiAgQG92ZXJyaWRlCiAgV2lkZ2V0IGJ1aWxkKEJ1aWxkQ29udGV4dCBjb250ZXh0KSB7CiAgICByZXR1cm4gTWF0ZXJpYWxBcHAoCiAgICAgIHRpdGxlOiAnU2NyY3B5IOiZmuaLn+Wxj+aMguacuuWKqeaJiycsCiAgICAgIGRlYnVnU2hvd0NoZWNrZWRNb2RlQmFubmVyOiBmYWxzZSwKICAgICAgdGhlbWU6IFRoZW1lRGF0YSgKICAgICAgICB1c2VNYXRlcmlhbDM6IHRydWUsCiAgICAgICAgY29sb3JTY2hlbWVTZWVkOiBjb25zdCBDb2xvcigweEZGMDA2RDc3KSwKICAgICAgICBicmlnaHRuZXNzOiBCcmlnaHRuZXNzLmRhcmssCiAgICAgICksCiAgICAgIGhvbWU6IGNvbnN0IEhvbWVTY3JlZW4oKSwKICAgICk7CiAgfQp9CgpjbGFzcyBBcHBFbnRyeSB7CiAgZmluYWwgU3RyaW5nIG5hbWU7CiAgZmluYWwgU3RyaW5nIHBhY2thZ2VOYW1lOwoKICBjb25zdCBBcHBFbnRyeSh7cmVxdWlyZWQgdGhpcy5uYW1lLCByZXF1aXJlZCB0aGlzLnBhY2thZ2VOYW1lfSk7CgogIGZhY3RvcnkgQXBwRW50cnkuZnJvbU1hcChNYXA8ZHluYW1pYywgZHluYW1pYz4gbWFwKSB7CiAgICByZXR1cm4gQXBwRW50cnkoCiAgICAgIG5hbWU6IChtYXBbJ25hbWUnXSA/PyAnJykudG9TdHJpbmcoKSwKICAgICAgcGFja2FnZU5hbWU6IChtYXBbJ3BhY2thZ2VOYW1lJ10gPz8gJycpLnRvU3RyaW5nKCksCiAgICApOwogIH0KfQoKY2xhc3MgSG9tZVNjcmVlbiBleHRlbmRzIFN0YXRlZnVsV2lkZ2V0IHsKICBjb25zdCBIb21lU2NyZWVuKHtzdXBlci5rZXl9KTsKCiAgQG92ZXJyaWRlCiAgU3RhdGU8SG9tZVNjcmVlbj4gY3JlYXRlU3RhdGUoKSA9PiBfSG9tZVNjcmVlblN0YXRlKCk7Cn0KCmNsYXNzIF9Ib21lU2NyZWVuU3RhdGUgZXh0ZW5kcyBTdGF0ZTxIb21lU2NyZWVuPiB7CiAgc3RhdGljIGNvbnN0IE1ldGhvZENoYW5uZWwgX2NoYW5uZWwgPSBNZXRob2RDaGFubmVsKCdjb20uZXhhbXBsZS5zY3JjcHlfYWZrL2NvbnRyb2wnKTsKICBzdGF0aWMgY29uc3QgRXZlbnRDaGFubmVsIF9sb2dFdmVudENoYW5uZWwgPSBFdmVudENoYW5uZWwoJ2NvbS5leGFtcGxlLnNjcmNweV9hZmsvbG9ncycpOwoKICBib29sIF9zaGl6dWt1UnVubmluZyA9IGZhbHNlOwogIGJvb2wgX3NoaXp1a3VBdXRob3JpemVkID0gZmFsc2U7CiAgYm9vbCBfb3ZlcmxheUdyYW50ZWQgPSBmYWxzZTsKICBib29sIF92aXJ0dWFsRGlzcGxheUFjdGl2ZSA9IGZhbHNlOwogIGludCBfYWN0aXZlRGlzcGxheUlkID0gLTE7CgogIGludCBfd2lkdGggPSA3MjA7CiAgaW50IF9oZWlnaHQgPSAxMjgwOwogIGludCBfZHBpID0gMjQwOwogIGludCBfZnBzID0gMzA7CiAgaW50IF9iaXRyYXRlTWJwcyA9IDQ7CgogIExpc3Q8QXBwRW50cnk+IF9pbnN0YWxsZWRBcHBzID0gW107CiAgQXBwRW50cnk/IF9zZWxlY3RlZEFwcDsKICBmaW5hbCBUZXh0RWRpdGluZ0NvbnRyb2xsZXIgX2N1c3RvbVBhY2thZ2VDb250cm9sbGVyID0gVGV4dEVkaXRpbmdDb250cm9sbGVyKAogICAgdGV4dDogJ2NvbS5Ib1lvdmVyc2UuaGtycGdvdmVyc2VhJywKICApOwoKICBmaW5hbCBMaXN0PFN0cmluZz4gX2xvZ3MgPSBbXTsKICBTdHJlYW1TdWJzY3JpcHRpb248ZHluYW1pYz4/IF9sb2dTdWJzY3JpcHRpb247CgogIEBvdmVycmlkZQogIHZvaWQgaW5pdFN0YXRlKCkgewogICAgc3VwZXIuaW5pdFN0YXRlKCk7CiAgICBfaW5pdFRlbGVtZXRyeSgpOwogICAgX3JlZnJlc2hTdGF0dXMoKTsKICB9CgogIHZvaWQgX2luaXRUZWxlbWV0cnkoKSB7CiAgICBfbG9nU3Vic2NyaXB0aW9uID0gX2xvZ0V2ZW50Q2hhbm5lbC5yZWNlaXZlQnJvYWRjYXN0U3RyZWFtKCkubGlzdGVuKChldmVudCkgewogICAgICBpZiAoIW1vdW50ZWQpIHJldHVybjsKICAgICAgc2V0U3RhdGUoKCkgewogICAgICAgIF9sb2dzLmluc2VydCgwLCAnWyR7VGltZU9mRGF5Lm5vdygpLmZvcm1hdChjb250ZXh0KX1dICRldmVudCcpOwogICAgICAgIGlmIChfbG9ncy5sZW5ndGggPiAxMDApIF9sb2dzLnJlbW92ZUxhc3QoKTsKICAgICAgfSk7CiAgICB9LCBvbkVycm9yOiAoT2JqZWN0IGVycikgewogICAgICBfYXBwZW5kTG9nKCfml6Xlv5fpgJrpgZPlvILluLg6ICRlcnInKTsKICAgIH0pOwogIH0KCiAgdm9pZCBfYXBwZW5kTG9nKFN0cmluZyBtc2cpIHsKICAgIGlmICghbW91bnRlZCkgcmV0dXJuOwogICAgc2V0U3RhdGUoKCkgewogICAgICBfbG9ncy5pbnNlcnQoMCwgJ1ske1RpbWVPZkRheS5ub3coKS5mb3JtYXQoY29udGV4dCl9XSAkbXNnJyk7CiAgICB9KTsKICB9CgogIEZ1dHVyZTx2b2lkPiBfcmVmcmVzaFN0YXR1cygpIGFzeW5jIHsKICAgIHRyeSB7CiAgICAgIGZpbmFsIE1hcDxkeW5hbWljLCBkeW5hbWljPj8gc3RhdHVzID0gYXdhaXQgX2NoYW5uZWwuaW52b2tlTWV0aG9kKCdnZXRTdGF0dXMnKTsKICAgICAgaWYgKHN0YXR1cyAhPSBudWxsICYmIG1vdW50ZWQpIHsKICAgICAgICBzZXRTdGF0ZSgoKSB7CiAgICAgICAgICBfc2hpenVrdVJ1bm5pbmcgPSBzdGF0dXNbJ3NoaXp1a3VSdW5uaW5nJ10gPT0gdHJ1ZTsKICAgICAgICAgIF9zaGl6dWt1QXV0aG9yaXplZCA9IHN0YXR1c1snc2hpenVrdUF1dGhvcml6ZWQnXSA9PSB0cnVlOwogICAgICAgICAgX292ZXJsYXlHcmFudGVkID0gc3RhdHVzWydvdmVybGF5R3JhbnRlZCddID09IHRydWU7CiAgICAgICAgICBfdmlydHVhbERpc3BsYXlBY3RpdmUgPSBzdGF0dXNbJ3ZpcnR1YWxEaXNwbGF5QWN0aXZlJ10gPT0gdHJ1ZTsKICAgICAgICAgIF9hY3RpdmVEaXNwbGF5SWQgPSAoc3RhdHVzWydkaXNwbGF5SWQnXSA/PyAtMSkgYXMgaW50OwogICAgICAgIH0pOwogICAgICB9CiAgICAgIGlmIChfc2hpenVrdUF1dGhvcml6ZWQgJiYgX2luc3RhbGxlZEFwcHMuaXNFbXB0eSkgewogICAgICAgIGF3YWl0IF9sb2FkSW5zdGFsbGVkQXBwcygpOwogICAgICB9CiAgICB9IG9uIFBsYXRmb3JtRXhjZXB0aW9uIGNhdGNoICh
+          cat <<'EOF_DART' > lib/main.dart
+          import 'dart:async';
+          import 'package:flutter/material.dart';
+          import 'package:flutter/services.dart';
+
+          void main() {
+            WidgetsFlutterBinding.ensureInitialized();
+            runApp(const ScrcpyAfkApp());
+          }
+
+          class ScrcpyAfkApp extends StatelessWidget {
+            const ScrcpyAfkApp({super.key});
+
+            @override
+            Widget build(BuildContext context) {
+              return MaterialApp(
+                title: 'Scrcpy 虚拟屏挂机助手',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  useMaterial3: true,
+                  colorSchemeSeed: const Color(0xFF006D77),
+                  brightness: Brightness.dark,
+                ),
+                home: const HomeScreen(),
+              );
+            }
+          }
+
+          class AppEntry {
+            final String name;
+            final String packageName;
+
+            const AppEntry({required this.name, required this.packageName});
+
+            factory AppEntry.fromMap(Map<dynamic, dynamic> map) {
+              return AppEntry(
+                name: (map['name'] ?? '').toString(),
+                packageName: (map['packageName'] ?? '').toString(),
+              );
+            }
+          }
+
+          class HomeScreen extends StatefulWidget {
+            const HomeScreen({super.key});
+
+            @override
+            State<HomeScreen> createState() => _HomeScreenState();
+          }
+
+          class _HomeScreenState extends State<HomeScreen> {
+            static const MethodChannel _channel = MethodChannel('com.example.scrcpy_afk/control');
+            static const EventChannel _logEventChannel = EventChannel('com.example.scrcpy_afk/logs');
+
+            bool _shizukuRunning = false;
+            bool _shizukuAuthorized = false;
+            bool _overlayGranted = false;
+            bool _virtualDisplayActive = false;
+            int _activeDisplayId = -1;
+
+            int _width = 720;
+            int _height = 1280;
+            int _dpi = 240;
+            int _fps = 30;
+            int _bitrateMbps = 4;
+
+            List<AppEntry> _installedApps = [];
+            AppEntry? _selectedApp;
+            final TextEditingController _customPackageController = TextEditingController(
+              text: 'com.HoYoverse.hkrpgoversea',
+            );
+
+            final List<String> _logs = [];
+            StreamSubscription<dynamic>? _logSubscription;
+
+            @override
+            void initState() {
+              super.initState();
+              _initTelemetry();
+              _refreshStatus();
+            }
+
+            void _initTelemetry() {
+              _logSubscription = _logEventChannel.receiveBroadcastStream().listen((event) {
+                if (!mounted) return;
+                setState(() {
+                  _logs.insert(0, '[${TimeOfDay.now().format(context)}] $event');
+                  if (_logs.length > 100) _logs.removeLast();
+                });
+              }, onError: (Object err) {
+                _appendLog('日志通道异常: $err');
+              });
+            }
+
+            void _appendLog(String msg) {
+              if (!mounted) return;
+              setState(() {
+                _logs.insert(0, '[${TimeOfDay.now().format(context)}] $msg');
+              });
+            }
+
+            Future<void> _refreshStatus() async {
+              try {
+                final Map<dynamic, dynamic>? status = await _channel.invokeMethod('getStatus');
+                if (status != null && mounted) {
+                  setState(() {
+                    _shizukuRunning = status['shizukuRunning'] == true;
+                    _shizukuAuthorized = status['shizukuAuthorized'] == true;
+                    _overlayGranted = status['overlayGranted'] == true;
+                    _virtualDisplayActive = status['virtualDisplayActive'] == true;
+                    _activeDisplayId = (status['displayId'] ?? -1) as int;
+                  });
+                }
+                if (_shizukuAuthorized && _installedApps.isEmpty) {
+                  await _loadInstalledApps();
+                }
+              } on PlatformException catch (e) {
+                _appendLog('获取状态失败: ${e.message}');
+              }
+            }
+
+            Future<void> _requestShizukuPermission() async {
+              try {
+                await _channel.invokeMethod('requestShizukuPermission');
+                await Future<void>.delayed(const Duration(seconds: 1));
+                await _refreshStatus();
+              } on PlatformException catch (e) {
+                _appendLog('请求 Shizuku 权限失败: ${e.message}');
+              }
+            }
+
+            Future<void> _requestOverlayPermission() async {
+              try {
+                await _channel.invokeMethod('requestOverlayPermission');
+                await Future<void>.delayed(const Duration(seconds: 1));
+                await _refreshStatus();
+              } on PlatformException catch (e) {
+                _appendLog('请求悬浮窗权限失败: ${e.message}');
+              }
+            }
+
+            Future<void> _loadInstalledApps() async {
+              try {
+                final List<dynamic>? rawList = await _channel.invokeMethod('getInstalledApps');
+                if (rawList != null && mounted) {
+                  final apps = rawList
+                      .map((e) => AppEntry.fromMap(e as Map<dynamic, dynamic>))
+                      .toList();
+                  setState(() {
+                    _installedApps = apps;
+                    if (apps.isNotEmpty && _selectedApp == null) {
+                      _selectedApp = apps.first;
+                      _customPackageController.text = apps.first.packageName;
+                    }
+                  });
+                }
+              } on PlatformException catch (e) {
+                _appendLog('读取应用列表失败: ${e.message}');
+              }
+            }
+
+            Future<void> _startVirtualDisplayAndFloatingWindow() async {
+              final pkg = _customPackageController.text.trim();
+              if (pkg.isEmpty) {
+                _appendLog('请填写或选择要挂机的游戏包名');
+                return;
+              }
+
+              try {
+                _appendLog('正在通过 Shizuku + scrcpy 创建虚拟屏 (${_width}x$_height @ $_dpi dpi)...');
+                final Map<dynamic, dynamic>? res = await _channel.invokeMethod('startVirtualSession', {
+                  'width': _width,
+                  'height': _height,
+                  'dpi': _dpi,
+                  'fps': _fps,
+                  'bitrate': _bitrateMbps * 1000000,
+                  'packageName': pkg,
+                });
+
+                if (res != null && mounted) {
+                  setState(() {
+                    _virtualDisplayActive = res['active'] == true;
+                    _activeDisplayId = (res['displayId'] ?? -1) as int;
+                  });
+                  _appendLog('虚拟屏启动成功: Display ID=$_activeDisplayId，已拉起悬浮窗并投递应用 $pkg');
+                }
+              } on PlatformException catch (e) {
+                _appendLog('启动虚拟屏失败: ${e.message}');
+              }
+            }
+
+            Future<void> _launchGameOnVirtualDisplay() async {
+              final pkg = _customPackageController.text.trim();
+              if (pkg.isEmpty || !_virtualDisplayActive) return;
+
+              try {
+                await _channel.invokeMethod('launchAppOnVirtualDisplay', {
+                  'packageName': pkg,
+                  'displayId': _activeDisplayId,
+                });
+                _appendLog('已通过 am start --display $_activeDisplayId 重新拉起 $pkg');
+              } on PlatformException catch (e) {
+                _appendLog('拉起应用失败: ${e.message}');
+              }
+            }
+
+            Future<void> _toggleFloatingPipMode(bool minimizeToIcon) async {
+              try {
+                await _channel.invokeMethod('setFloatingMinimized', {
+                  'minimized': minimizeToIcon,
+                });
+                _appendLog(minimizeToIcon ? '悬浮窗已折叠为挂机小浮标（省电保活模式）' : '悬浮窗已展开画面');
+              } on PlatformException catch (e) {
+                _appendLog('切换悬浮窗状态失败: ${e.message}');
+              }
+            }
+
+            Future<void> _stopVirtualSession() async {
+              try {
+                await _channel.invokeMethod('stopVirtualSession');
+                if (mounted) {
+                  setState(() {
+                    _virtualDisplayActive = false;
+                    _activeDisplayId = -1;
+                  });
+                }
+                _appendLog('虚拟屏与 scrcpy 服务已安全销毁');
+              } on PlatformException catch (e) {
+                _appendLog('停止虚拟屏失败: ${e.message}');
+              }
+            }
+
+            @override
+            void dispose() {
+              _logSubscription?.cancel();
+              _customPackageController.dispose();
+              super.dispose();
+            }
+
+            @override
+            Widget build(BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: const Text('Scrcpy + Shizuku 虚拟屏挂机'),
+                  actions: [
+                    IconButton(
+                      onPressed: _refreshStatus,
+                      icon: const Icon(Icons.refresh),
+                      tooltip: '刷新状态',
+                    ),
+                  ],
+                ),
+                body: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    _buildPermissionSection(),
+                    const SizedBox(height: 16),
+                    _buildDisplayConfigSection(),
+                    const SizedBox(height: 16),
+                    _buildTargetAppSection(),
+                    const SizedBox(height: 16),
+                    _buildActionButtons(),
+                    const SizedBox(height: 16),
+                    _buildLogConsole(),
+                  ],
+                ),
+              );
+            }
+
+            Widget _buildPermissionSection() {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '1. 核心权限与环境状态',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          _shizukuAuthorized ? Icons.verified_user : Icons.security_update_warning,
+                          color: _shizukuAuthorized ? Colors.tealAccent : Colors.orangeAccent,
+                        ),
+                        title: Text(
+                          'Shizuku 服务 (${_shizukuRunning ? "运行中" : "未启动"})',
+                        ),
+                        subtitle: Text(
+                          _shizukuAuthorized ? '已获取 ADB Shell (UID 2000) 授权' : '需授权以创建 VirtualDisplay 与注入多点触控',
+                        ),
+                        trailing: FilledButton.tonal(
+                          onPressed: _shizukuAuthorized ? _refreshStatus : _requestShizukuPermission,
+                          child: Text(_shizukuAuthorized ? '已授权' : '请求授权'),
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          _overlayGranted ? Icons.picture_in_picture : Icons.layers_clear,
+                          color: _overlayGranted ? Colors.tealAccent : Colors.orangeAccent,
+                        ),
+                        title: const Text('系统全局悬浮窗权限 (SYSTEM_ALERT_WINDOW)'),
+                        subtitle: const Text('用于在后台/桌面实时预览虚拟屏画面并支持小窗触控与折叠挂机'),
+                        trailing: FilledButton.tonal(
+                          onPressed: _overlayGranted ? _refreshStatus : _requestOverlayPermission,
+                          child: Text(_overlayGranted ? '已开启' : '去开启'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            Widget _buildDisplayConfigSection() {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '2. 虚拟显示器与 Scrcpy 编码参数',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: '${_width}x$_height',
+                              decoration: const InputDecoration(
+                                labelText: '分辨率 (宽x高)',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: '540x960', child: Text('540x960 (极速省电挂机)')),
+                                DropdownMenuItem(value: '720x1280', child: Text('720x1280 (竖屏 720P)')),
+                                DropdownMenuItem(value: '1280x720', child: Text('1280x720 (横屏手游 720P)')),
+                                DropdownMenuItem(value: '1920x1080', child: Text('1920x1080 (横屏 1080P)')),
+                              ],
+                              onChanged: _virtualDisplayActive
+                                  ? null
+                                  : (val) {
+                                      if (val == null) return;
+                                      final parts = val.split('x');
+                                      setState(() {
+                                        _width = int.parse(parts[0]);
+                                        _height = int.parse(parts[1]);
+                                      });
+                                    },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: DropdownButtonFormField<int>(
+                              value: _dpi,
+                              decoration: const InputDecoration(
+                                labelText: '虚拟 DPI',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: 160, child: Text('160 DPI')),
+                                DropdownMenuItem(value: 240, child: Text('240 DPI (推荐)')),
+                                DropdownMenuItem(value: 320, child: Text('320 DPI')),
+                              ],
+                              onChanged: _virtualDisplayActive
+                                  ? null
+                                  : (val) {
+                                      if (val != null) setState(() => _dpi = val);
+                                    },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('帧率上限: $_fps FPS'),
+                                Slider(
+                                  value: _fps.toDouble(),
+                                  min: 15,
+                                  max: 60,
+                                  divisions: 3,
+                                  label: '$_fps FPS',
+                                  onChanged: _virtualDisplayActive
+                                      ? null
+                                      : (v) => setState(() => _fps = v.round()),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('视频码率: $_bitrateMbps Mbps'),
+                                Slider(
+                                  value: _bitrateMbps.toDouble(),
+                                  min: 2,
+                                  max: 12,
+                                  divisions: 5,
+                                  label: '$_bitrateMbps Mbps',
+                                  onChanged: _virtualDisplayActive
+                                      ? null
+                                      : (v) => setState(() => _bitrateMbps = v.round()),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            Widget _buildTargetAppSection() {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '3. 目标挂机游戏 / 应用',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      if (_installedApps.isNotEmpty) ...[
+                        DropdownButtonFormField<AppEntry>(
+                          value: _selectedApp,
+                          decoration: const InputDecoration(
+                            labelText: '选择已安装应用',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: _installedApps
+                              .map((app) => DropdownMenuItem(
+                                    value: app,
+                                    child: Text('${app.name} (${app.packageName})'),
+                                  ))
+                              .toList(),
+                          onChanged: (app) {
+                            if (app != null) {
+                              setState(() {
+                                _selectedApp = app;
+                                _customPackageController.text = app.packageName;
+                              });
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      TextField(
+                        controller: _customPackageController,
+                        decoration: InputDecoration(
+                          labelText: '游戏 Package Name',
+                          hintText: '例如 com.HoYoverse.hkrpgoversea',
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.apps),
+                            tooltip: '读取应用列表',
+                            onPressed: _loadInstalledApps,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            Widget _buildActionButtons() {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            _virtualDisplayActive ? Icons.cast_connected : Icons.cast,
+                            color: _virtualDisplayActive ? Colors.greenAccent : Colors.grey,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _virtualDisplayActive
+                                ? '虚拟屏运行中 (Display ID: $_activeDisplayId)'
+                                : '虚拟屏未启动',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          FilledButton.icon(
+                            onPressed: (!_shizukuAuthorized || !_overlayGranted || _virtualDisplayActive)
+                                ? null
+                                : _startVirtualDisplayAndFloatingWindow,
+                            icon: const Icon(Icons.play_arrow),
+                            label: const Text('创建虚拟屏并启动悬浮窗挂机'),
+                          ),
+                          FilledButton.tonalIcon(
+                            onPressed: _virtualDisplayActive ? _launchGameOnVirtualDisplay : null,
+                            icon: const Icon(Icons.rocket_launch),
+                            label: const Text('在虚拟屏重开游戏'),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _virtualDisplayActive ? () => _toggleFloatingPipMode(true) : null,
+                            icon: const Icon(Icons.minimize),
+                            label: const Text('折叠为挂机小浮标'),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _virtualDisplayActive ? _stopVirtualSession : null,
+                            style: OutlinedButton.styleFrom(foregroundColor: Colors.redAccent),
+                            icon: const Icon(Icons.stop_circle_outlined),
+                            label: const Text('销毁虚拟屏'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            Widget _buildLogConsole() {
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '4. Scrcpy & Shizuku 实时控制台',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          TextButton(
+                            onPressed: () => setState(() => _logs.clear()),
+                            child: const Text('清空'),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 180,
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: _logs.isEmpty
+                            ? const Text('等待操作日志...', style: TextStyle(color: Colors.white54))
+                            : ListView.builder(
+                                itemCount: _logs.length,
+                                itemBuilder: (ctx, idx) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 2),
+                                  child: Text(
+                                    _logs[idx],
+                                    style: const TextStyle(
+                                      fontFamily: 'monospace',
+                                      fontSize: 12,
+                                      color: Colors.greenAccent,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }
+          EOF_DART
+
+          mkdir -p android/app/src/main/kotlin/com/example/scrcpy_afk
+          cat <<'EOF_KT' > android/app/src/main/kotlin/com/example/scrcpy_afk/MainActivity.kt
+          package com.example.scrcpy_afk
+
+          import android.annotation.SuppressLint
+          import android.app.Notification
+          import android.app.NotificationChannel
+          import android.app.NotificationManager
+          import android.app.Service
+          import android.content.Context
+          import android.content.Intent
+          import android.content.pm.ApplicationInfo
+          import android.content.pm.PackageManager
+          import android.graphics.PixelFormat
+          import android.media.MediaCodec
+          import android.media.MediaFormat
+          import android.net.LocalSocket
+          import android.net.LocalSocketAddress
+          import android.net.Uri
+          import android.os.Build
+          import android.os.Handler
+          import android.os.IBinder
+          import android.os.Looper
+          import android.provider.Settings
+          import android.view.Gravity
+          import android.view.MotionEvent
+          import android.view.Surface
+          import android.view.SurfaceHolder
+          import android.view.SurfaceView
+          import android.view.View
+          import android.view.WindowManager
+          import android.widget.FrameLayout
+          import android.widget.LinearLayout
+          import android.widget.TextView
+          import androidx.core.app.NotificationCompat
+          import io.flutter.embedding.android.FlutterActivity
+          import io.flutter.embedding.engine.FlutterEngine
+          import io.flutter.plugin.common.EventChannel
+          import io.flutter.plugin.common.MethodCall
+          import io.flutter.plugin.common.MethodChannel
+          import rikka.shizuku.Shizuku
+          import java.io.BufferedReader
+          import java.io.DataInputStream
+          import java.io.DataOutputStream
+          import java.io.File
+          import java.io.FileOutputStream
+          import java.io.InputStreamReader
+          import java.nio.ByteBuffer
+          import java.util.concurrent.Executors
+          import java.util.concurrent.atomic.AtomicBoolean
+
+          /**
+           * 1. Flutter 主 Activity：负责 MethodChannel / EventChannel 桥接、Shizuku 权限校验与悬浮窗服务调度
+           */
+          class MainActivity : FlutterActivity(), Shizuku.OnRequestPermissionResultListener {
+
+              companion object {
+                  private const val METHOD_CHANNEL = "com.example.scrcpy_afk/control"
+                  private const val EVENT_CHANNEL = "com.example.scrcpy_afk/logs"
+                  private const val SHIZUKU_REQUEST_CODE = 1001
+
+                  private var eventSink: EventChannel.EventSink? = null
+                  private val mainHandler = Handler(Looper.getMainLooper())
+
+                  fun sendLog(msg: String) {
+                      mainHandler.post {
+                          eventSink?.success(msg)
+                      }
+                  }
+              }
+
+              override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+                  super.configureFlutterEngine(flutterEngine)
+                  Shizuku.addRequestPermissionResultListener(this)
+
+                  EventChannel(flutterEngine.dartExecutor.binaryMessenger, EVENT_CHANNEL).setStreamHandler(
+                      object : EventChannel.StreamHandler {
+                          override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                              eventSink = events
+                              sendLog("日志通道已就绪")
+                          }
+
+                          override fun onCancel(arguments: Any?) {
+                              eventSink = null
+                          }
+                      }
+                  )
+
+                  MethodChannel(flutterEngine.dartExecutor.binaryMessenger, METHOD_CHANNEL)
+                      .setMethodCallHandler { call, result ->
+                          handleMethodCall(call, result)
+                      }
+              }
+
+              private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
+                  when (call.method) {
+                      "getStatus" -> {
+                          val running = Shizuku.pingBinder()
+                          val authorized = running && (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED)
+                          val overlay = Settings.canDrawOverlays(this)
+                          result.success(
+                              mapOf(
+                                  "shizukuRunning" to running,
+                                  "shizukuAuthorized" to authorized,
+                                  "overlayGranted" to overlay,
+                                  "virtualDisplayActive" to FloatingScrcpyService.isRunning.get(),
+                                  "displayId" to FloatingScrcpyService.currentDisplayId
+                              )
+                          )
+                      }
+
+                      "requestShizukuPermission" -> {
+                          if (!Shizuku.pingBinder()) {
+                              result.error("SHIZUKU_NOT_RUNNING", "请先启动 Shizuku App 并激活无线调试/Root服务", null)
+                              return
+                          }
+                          if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                              result.success(true)
+                          } else {
+                              Shizuku.requestPermission(SHIZUKU_REQUEST_CODE)
+                              result.success(false)
+                          }
+                      }
+
+                      "requestOverlayPermission" -> {
+                          if (!Settings.canDrawOverlays(this)) {
+                              val intent = Intent(
+                                  Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                  Uri.parse("package:$packageName")
+                              )
+                              startActivity(intent)
+                          }
+                          result.success(true)
+                      }
+
+                      "getInstalledApps" -> {
+                          val pm = packageManager
+                          val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+                              .filter { (it.flags and ApplicationInfo.FLAG_SYSTEM) == 0 }
+                              .map {
+                                  mapOf(
+                                      "name" to pm.getApplicationLabel(it).toString(),
+                                      "packageName" to it.packageName
+                                  )
+                              }
+                              .sortedBy { it["name"] }
+                          result.success(apps)
+                      }
+
+                      "startVirtualSession" -> {
+                          val width = call.argument<Int>("width") ?: 720
+                          val height = call.argument<Int>("height") ?: 1280
+                          val dpi = call.argument<Int>("dpi") ?: 240
+                          val fps = call.argument<Int>("fps") ?: 30
+                          val bitrate = call.argument<Int>("bitrate") ?: 4_000_000
+                          val pkg = call.argument<String>("packageName") ?: ""
+
+                          val serviceIntent = Intent(this, FloatingScrcpyService::class.java).apply {
+                              action = FloatingScrcpyService.ACTION_START
+                              putExtra("width", width)
+                              putExtra("height", height)
+                              putExtra("dpi", dpi)
+                              putExtra("fps", fps)
+                              putExtra("bitrate", bitrate)
+                              putExtra("packageName", pkg)
+                          }
+                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                              startForegroundService(serviceIntent)
+                          } else {
+                              startService(serviceIntent)
+                          }
+
+                          // 等待虚拟屏 DisplayId 分配回传
+                          mainHandler.postDelayed({
+                              result.success(
+                                  mapOf(
+                                      "active" to FloatingScrcpyService.isRunning.get(),
+                                      "displayId" to FloatingScrcpyService.currentDisplayId
+                                  )
+                              )
+                          }, 900)
+                      }
+
+                      "launchAppOnVirtualDisplay" -> {
+                          val pkg = call.argument<String>("packageName") ?: ""
+                          val displayId = call.argument<Int>("displayId") ?: FloatingScrcpyService.currentDisplayId
+                          if (displayId > 0 && pkg.isNotEmpty()) {
+                              ShizukuShellExecutor.launchAppOnDisplay(this, pkg, displayId)
+                              result.success(true)
+                          } else {
+                              result.error("INVALID_DISPLAY", "虚拟屏尚未就绪", null)
+                          }
+                      }
+
+                      "setFloatingMinimized" -> {
+                          val minimized = call.argument<Boolean>("minimized") ?: false
+                          val intent = Intent(this, FloatingScrcpyService::class.java).apply {
+                              action = FloatingScrcpyService.ACTION_MINIMIZE
+                              putExtra("minimized", minimized)
+                          }
+                          startService(intent)
+                          result.success(true)
+                      }
+
+                      "stopVirtualSession" -> {
+                          val intent = Intent(this, FloatingScrcpyService::class.java).apply {
+                              action = FloatingScrcpyService.ACTION_STOP
+                          }
+                          startService(intent)
+                          result.success(true)
+                      }
+
+                      else -> result.notImplemented()
+                  }
+              }
+
+              override fun onRequestPermissionResult(requestCode: Int, grantResult: Int) {
+                  if (requestCode == SHIZUKU_REQUEST_CODE) {
+                      val granted = grantResult == PackageManager.PERMISSION_GRANTED
+                      sendLog(if (granted) "Shizuku 授权成功" else "Shizuku 授权被拒绝")
+                  }
+              }
+
+              override fun onDestroy() {
+                  Shizuku.removeRequestPermissionResultListener(this)
+                  super.onDestroy()
+              }
+          }
+
+          /**
+           * 2. Shizuku Shell 执行器：负责在 UID 2000 (shell) 权限下启动 scrcpy-server 及将游戏投递到指定 VirtualDisplay
+           */
+          object ShizukuShellExecutor {
+
+              fun execCommandAsync(cmd: String, onLine: (String) -> Unit): Process? {
+                  return try {
+                      // Shizuku.newProcess 在 13.x 中为 private/internal 或通过反射调用，使用反射确保全版本兼容
+                      val newProcessMethod = Shizuku::class.java.getDeclaredMethod(
+                          "newProcess",
+                          Array<String>::class.java,
+                          Array<String>::class.java,
+                          String::class.java
+                      )
+                      newProcessMethod.isAccessible = true
+                      val process = newProcessMethod.invoke(
+                          null,
+                          arrayOf("sh", "-c", cmd),
+                          null,
+                          null
+                      ) as Process
+
+                      Executors.newSingleThreadExecutor().execute {
+                          BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
+                              var line: String?
+                              while (reader.readLine().also { line = it } != null) {
+                                  line?.let(onLine)
+                              }
+                          }
+                      }
+                      process
+                  } catch (e: Exception) {
+                      MainActivity.sendLog("Shizuku 执行异常: ${e.message}")
+                      null
+                  }
+              }
+
+              fun launchAppOnDisplay(context: Context, packageName: String, displayId: Int) {
+                  val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
+                  val component = launchIntent?.component?.flattenToShortString()
+                  val cmd = if (component != null) {
+                      // --activity-single-top 与 --display 配合，强制将游戏 Activity 放入新建的虚拟屏栈并防息屏休眠
+                      "am start --display $displayId --activity-clear-task -n $component"
+                  } else {
+                      "monkey -p $packageName -c android.intent.category.LAUNCHER 1"
+                  }
+                  MainActivity.sendLog("执行投屏启动指令: $cmd")
+                  execCommandAsync(cmd) { line ->
+                      MainActivity.sendLog("[am] $line")
+                  }
+              }
+          }
+
+          /**
+           * 3. 全局悬浮窗与 Scrcpy 虚拟屏流媒体前台服务
+           *    - 通过 scrcpy-server v2.4+ 的 `--new-display` 在系统底层创建独立 VirtualDisplay（无需保持主屏常亮，支持后台挂机）
+           *    - 通过 LocalSocket 接收 H.264 裸流并交由硬件 MediaCodec 零拷贝渲染到悬浮窗 SurfaceView
+           *    - 将用户在悬浮窗上的多点触控坐标实时封装为 scrcpy ControlMessage 注入虚拟屏
+           */
+          class FloatingScrcpyService : Service() {
+
+              companion object {
+                  const val ACTION_START = "com.example.scrcpy_afk.START"
+                  const val ACTION_STOP = "com.example.scrcpy_afk.STOP"
+                  const val ACTION_MINIMIZE = "com.example.scrcpy_afk.MINIMIZE"
+                  private const val SOCKET_NAME = "scrcpy_afk_virtual"
+
+                  val isRunning = AtomicBoolean(false)
+                  @Volatile
+                  var currentDisplayId: Int = -1
+              }
+
+              private lateinit var windowManager: WindowManager
+              private lateinit var rootFloatingLayout: FrameLayout
+              private lateinit var videoContainer: LinearLayout
+              private lateinit var floatingBadge: TextView
+              private lateinit var surfaceView: SurfaceView
+              private lateinit var layoutParams: WindowManager.LayoutParams
+
+              private var scrcpyProcess: Process? = null
+              private var videoSocket: LocalSocket? = null
+              private var controlSocket: LocalSocket? = null
+              private var controlOut: DataOutputStream? = null
+              private var mediaCodec: MediaCodec? = null
+
+              private var virtualWidth = 720
+              private var virtualHeight = 1280
+              private var virtualDpi = 240
+              private var targetFps = 30
+              private var targetBitrate = 4_000_000
+              private var targetPackage = ""
+
+              private val workerPool = Executors.newCachedThreadPool()
+
+              override fun onBind(intent: Intent?): IBinder? = null
+
+              override fun onCreate() {
+                  super.onCreate()
+                  startForeground(101, buildForegroundNotification())
+                  windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                  initFloatingWindowUi()
+              }
+
+              override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+                  when (intent?.action) {
+                      ACTION_START -> {
+                          virtualWidth = intent.getIntExtra("width", 720)
+                          virtualHeight = intent.getIntExtra("height", 1280)
+                          virtualDpi = intent.getIntExtra("dpi", 240)
+                          targetFps = intent.getIntExtra("fps", 30)
+                          targetBitrate = intent.getIntExtra("bitrate", 4_000_000)
+                          targetPackage = intent.getStringExtra("packageName") ?: ""
+
+                          if (!isRunning.getAndSet(true)) {
+                              windowManager.addView(rootFloatingLayout, layoutParams)
+                              startScrcpyVirtualDisplayBackend()
+                          }
+                      }
+
+                      ACTION_MINIMIZE -> {
+                          val minimize = intent.getBooleanExtra("minimized", false)
+                          setMinimizedMode(minimize)
+                      }
+
+                      ACTION_STOP -> {
+                          stopVirtualDisplayAndCleanup()
+                          stopSelf()
+                      }
+                  }
+                  return START_STICKY
+              }
+
+              @SuppressLint("ClickableViewAccessibility")
+              private fun initFloatingWindowUi() {
+                  val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                      WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                  } else {
+                      @Suppress("DEPRECATION")
+                      WindowManager.LayoutParams.TYPE_PHONE
+                  }
+
+                  layoutParams = WindowManager.LayoutParams(
+                      620,
+                      960,
+                      overlayType,
+                      WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                          WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                          WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                      PixelFormat.TRANSLUCENT
+                  ).apply {
+                      gravity = Gravity.TOP or Gravity.START
+                      x = 60
+                      y = 160
+                  }
+
+                  rootFloatingLayout = FrameLayout(this)
+
+                  // 展开态容器：顶部拖拽控制栏 + 底部 SurfaceView 游戏画面
+                  videoContainer = LinearLayout(this).apply {
+                      orientation = LinearLayout.VERTICAL
+                      setBackgroundColor(0xEE1A1C1E.toInt())
+                  }
+
+                  val headerBar = LinearLayout(this).apply {
+                      orientation = LinearLayout.HORIZONTAL
+                      setPadding(24, 14, 24, 14)
+                      setBackgroundColor(0xFF006D77.toInt())
+                  }
+
+                  val titleView = TextView(this).apply {
+                      text = "虚拟屏挂机中 (拖动移动)"
+                      setTextColor(0xFFFFFFFF.toInt())
+                      textSize = 12f
+                      layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                  }
+
+                  val btnMinimize = TextView(this).apply {
+                      text = " [小窗保活] "
+                      setTextColor(0xFFE0FBFC.toInt())
+                      textSize = 12f
+                      setOnClickListener { setMinimizedMode(true) }
+                  }
+
+                  headerBar.addView(titleView)
+                  headerBar.addView(btnMinimize)
+
+                  // 支持按住顶部栏拖动悬浮窗位置
+                  var initialX = 0
+                  var initialY = 0
+                  var touchX = 0f
+                  var touchY = 0f
+                  headerBar.setOnTouchListener { _, event ->
+                      when (event.actionMasked) {
+                          MotionEvent.ACTION_DOWN -> {
+                              initialX = layoutParams.x
+                              initialY = layoutParams.y
+                              touchX = event.rawX
+                              touchY = event.rawY
+                              true
+                          }
+                          MotionEvent.ACTION_MOVE -> {
+                              layoutParams.x = initialX + (event.rawX - touchX).toInt()
+                              layoutParams.y = initialY + (event.rawY - touchY).toInt()
+                              windowManager.updateViewLayout(rootFloatingLayout, layoutParams)
+                              true
+                          }
+                          else -> false
+                      }
+                  }
+
+                  surfaceView = SurfaceView(this).apply {
+                      layoutParams = LinearLayout.LayoutParams(
+                          LinearLayout.LayoutParams.MATCH_PARENT,
+                          0,
+                          1f
+                      )
+                  }
+
+                  // 将悬浮窗 SurfaceView 上的触摸事件实时换算为虚拟屏坐标并通过 scrcpy 控制通道注入
+                  surfaceView.setOnTouchListener { view, event ->
+                      injectTouchEventToScrcpy(view, event)
+                      true
+                  }
+
+                  surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
+                      override fun surfaceCreated(holder: SurfaceHolder) {
+                          startHardwareDecoder(holder.surface)
+                      }
+                      override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+                      override fun surfaceDestroyed(holder: SurfaceHolder) {
+                          stopHardwareDecoder()
+                      }
+                  })
+
+                  videoContainer.addView(headerBar)
+                  videoContainer.addView(surfaceView)
+
+                  // 折叠态挂机浮标（仅占 120x120 像素，保持 VirtualDisplay 的 Surface 消费队列不被系统挂起）
+                  floatingBadge = TextView(this).apply {
+                      text = "挂机中\n点击展开"
+                      gravity = Gravity.CENTER
+                      setTextColor(0xFFFFFFFF.toInt())
+                      setBackgroundColor(0xDD006D77.toInt())
+                      textSize = 11f
+                      visibility = View.GONE
+                      setOnClickListener { setMinimizedMode(false) }
+                  }
+
+                  rootFloatingLayout.addView(videoContainer)
+                  rootFloatingLayout.addView(floatingBadge)
+              }
+
+              private fun setMinimizedMode(minimize: Boolean) {
+                  if (minimize) {
+                      videoContainer.visibility = View.GONE
+                      floatingBadge.visibility = View.VISIBLE
+                      layoutParams.width = 140
+                      layoutParams.height = 140
+                  } else {
+                      floatingBadge.visibility = View.GONE
+                      videoContainer.visibility = View.VISIBLE
+                      layoutParams.width = 620
+                      layoutParams.height = 960
+                  }
+                  windowManager.updateViewLayout(rootFloatingLayout, layoutParams)
+              }
+
+              /**
+               * 部署并拉起 scrcpy-server (使用 --new-display 创建独立虚拟屏)
+               */
+              private fun startScrcpyVirtualDisplayBackend() {
+                  workerPool.execute {
+                      try {
+                          // 1. 将 assets/scrcpy-server 复制到 /data/local/tmp/scrcpy-server.jar 供 shell (UID 2000) 读取
+                          val localJar = File(cacheDir, "scrcpy-server.jar")
+                          assets.open("scrcpy-server").use { input ->
+                              FileOutputStream(localJar).use { output -> input.copyTo(output) }
+                          }
+                          val tmpJarPath = "/data/local/tmp/scrcpy-server.jar"
+
+                          // 2. 组装 scrcpy 2.4+ 虚拟屏启动参数：
+                          //    new_display=720x1280/240 会在 DisplayManager 中创建独立 VirtualDisplay
+                          //    tunnel_forward=true 让 scrcpy-server 在本地监听 abstract local socket
+                          val cmd = buildString {
+                              append("cp ${localJar.absolutePath} $tmpJarPath && ")
+                              append("chmod 644 $tmpJarPath && ")
+                              append("CLASSPATH=$tmpJarPath app_process / com.genymobile.scrcpy.Server 2.4 ")
+                              append("scid=12345678 ")
+                              append("log_level=info ")
+                              append("video=true audio=false control=true ")
+                              append("tunnel_forward=true ")
+                              append("new_display=${virtualWidth}x${virtualHeight}/$virtualDpi ")
+                              append("max_fps=$targetFps ")
+                              append("video_bit_rate=$targetBitrate ")
+                              append("raw_stream=false ")
+                              append("send_device_meta=false send_frame_meta=true send_dummy_byte=false ")
+                              append("send_codec_meta=false")
+                          }
+
+                          scrcpyProcess = ShizukuShellExecutor.execCommandAsync(cmd) { logLine ->
+                              MainActivity.sendLog("[scrcpy] $logLine")
+                              // 解析 scrcpy 输出的新建虚拟屏 Display ID，例如: [server] INFO: New display: 720x1280/240 (id=2)
+                              val match = Regex("""\(id=(\d+)\)""").find(logLine)
+                              if (match != null) {
+                                  val parsedId = match.groupValues[1].toInt()
+                                  currentDisplayId = parsedId
+                                  MainActivity.sendLog("捕获到新建虚拟屏 Display ID = $parsedId")
+                                  if (targetPackage.isNotEmpty()) {
+                                      ShizukuShellExecutor.launchAppOnDisplay(this, targetPackage, parsedId)
+                                  }
+                              }
+                          }
+
+                          // 3. 连接 scrcpy 本地视频流 Socket 与控制流 Socket
+                          Thread.sleep(600)
+                          connectScrcpySockets()
+                      } catch (e: Exception) {
+                          MainActivity.sendLog("启动 scrcpy 虚拟屏后端失败: ${e.message}")
+                      }
+                  }
+              }
+
+              private fun connectScrcpySockets() {
+                  val socketAddr = LocalSocketAddress("scrcpy_12345678", LocalSocketAddress.Namespace.ABSTRACT)
+
+                  // 第一条连接：Video Stream Socket
+                  videoSocket = LocalSocket().apply { connect(socketAddr) }
+                  // 第二条连接：Control Stream Socket
+                  controlSocket = LocalSocket().apply { connect(socketAddr) }
+                  controlOut = DataOutputStream(controlSocket!!.outputStream)
+
+                  MainActivity.sendLog("已连接 scrcpy 视频流与触控通道 (localabstract:scrcpy_12345678)")
+              }
+
+              /**
+               * 启动 MediaCodec 硬件解码器，读取 scrcpy frame packet 并直接渲染到 SurfaceView
+               */
+              private fun startHardwareDecoder(surface: Surface) {
+                  workerPool.execute {
+                      try {
+                          // 等待 videoSocket 就绪
+                          var retries = 0
+                          while (videoSocket == null && retries < 25 && isRunning.get()) {
+                              Thread.sleep(100)
+                              retries++
+                          }
+                          val input = DataInputStream(videoSocket?.inputStream ?: return@execute)
+
+                          val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, virtualWidth, virtualHeight)
+                          mediaCodec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC).apply {
+                              configure(format, surface, null, 0)
+                              start()
+                          }
+
+                          val bufferInfo = MediaCodec.BufferInfo()
+                          while (isRunning.get()) {
+                              // scrcpy frame header: 8 bytes PTS + 4 bytes packet size
+                              val ptsFlags = input.readLong()
+                              val packetSize = input.readInt()
+                              if (packetSize <= 0 || packetSize > 8_000_000) continue
+
+                              val packet = ByteArray(packetSize)
+                              input.readFully(packet)
+
+                              val codec = mediaCodec ?: break
+                              val inIndex = codec.dequeueInputBuffer(10_000)
+                              if (inIndex >= 0) {
+                                  val inputBuffer: ByteBuffer? = codec.getInputBuffer(inIndex)
+                                  inputBuffer?.clear()
+                                  inputBuffer?.put(packet)
+                                  codec.queueInputBuffer(inIndex, 0, packetSize, ptsFlags and Long.MAX_VALUE, 0)
+                              }
+
+                              var outIndex = codec.dequeueOutputBuffer(bufferInfo, 10_000)
+                              while (outIndex >= 0) {
+                                  codec.releaseOutputBuffer(outIndex, true)
+                                  outIndex = codec.dequeueOutputBuffer(bufferInfo, 0)
+                              }
+                          }
+                      } catch (e: Exception) {
+                          if (isRunning.get()) {
+                              MainActivity.sendLog("视频解码流中断: ${e.message}")
+                          }
+                      }
+                  }
+              }
+
+              private fun stopHardwareDecoder() {
+                  try {
+                      mediaCodec?.stop()
+                      mediaCodec?.release()
+                  } catch (_: Exception) {
+                  } finally {
+                      mediaCodec = null
+                  }
+              }
+
+              /**
+               * 将悬浮窗的触摸事件按 scrcpy ControlMessage (TYPE_INJECT_TOUCH_EVENT = 2) 协议编码发送至虚拟屏
+               * 协议结构 (共 32 字节):
+               * [0]: 1B type = 2 (SC_CONTROL_MSG_TYPE_INJECT_TOUCH_EVENT)
+               * [1]: 1B action (MotionEvent.ACTION_DOWN / UP / MOVE)
+               * [2..9]: 8B pointerId
+               * [10..13]: 4B x (映射至虚拟屏宽度)
+               * [14..17]: 4B y (映射至虚拟屏高度)
+               * [18..19]: 2B screenWidth (uint16)
+               * [20..21]: 2B screenHeight (uint16)
+               * [22..23]: 2B pressure (0xFFFF)
+               * [24..27]: 4B actionButton
+               * [28..31]: 4B buttons
+               */
+              private fun injectTouchEventToScrcpy(view: View, event: MotionEvent) {
+                  val out = controlOut ?: return
+                  val actionIndex = event.actionIndex
+                  val pointerId = event.getPointerId(actionIndex).toLong()
+                  val mappedX = ((event.getX(actionIndex) / view.width.coerceAtLeast(1)) * virtualWidth)
+                      .toInt().coerceIn(0, virtualWidth)
+                  val mappedY = ((event.getY(actionIndex) / view.height.coerceAtLeast(1)) * virtualHeight)
+                      .toInt().coerceIn(0, virtualHeight)
+
+                  val actionByte = when (event.actionMasked) {
+                      MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> MotionEvent.ACTION_DOWN
+                      MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_CANCEL -> MotionEvent.ACTION_UP
+                      else -> MotionEvent.ACTION_MOVE
+                  }
+
+                  workerPool.execute {
+                      try {
+                          val buf = ByteBuffer.allocate(32)
+                          buf.put(2.toByte()) // TYPE_INJECT_TOUCH_EVENT
+                          buf.put(actionByte.toByte())
+                          buf.putLong(pointerId)
+                          buf.putInt(mappedX)
+                          buf.putInt(mappedY)
+                          buf.putShort(virtualWidth.toShort())
+                          buf.putShort(virtualHeight.toShort())
+                          buf.putShort(if (actionByte == MotionEvent.ACTION_UP) 0 else 0xFFFF.toShort())
+                          buf.putInt(0) // actionButton
+                          buf.putInt(0) // buttons
+                          synchronized(out) {
+                              out.write(buf.array())
+                              out.flush()
+                          }
+                      } catch (_: Exception) {
+                      }
+                  }
+              }
+
+              private fun stopVirtualDisplayAndCleanup() {
+                  isRunning.set(false)
+                  currentDisplayId = -1
+                  stopHardwareDecoder()
+                  try {
+                      controlSocket?.close()
+                      videoSocket?.close()
+                      scrcpyProcess?.destroy()
+                  } catch (_: Exception) {
+                  }
+                  try {
+                      if (::rootFloatingLayout.isInitialized) {
+                          windowManager.removeView(rootFloatingLayout)
+                      }
+                  } catch (_: Exception) {
+                  }
+              }
+
+              private fun buildForegroundNotification(): Notification {
+                  val channelId = "scrcpy_afk_channel"
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                      val channel = NotificationChannel(
+                          channelId,
+                          "Scrcpy 虚拟屏挂机服务",
+                          NotificationManager.IMPORTANCE_LOW
+                      )
+                      val nm = getSystemService(NotificationManager::class.java)
+                      nm.createNotificationChannel(channel)
+                  }
+                  return NotificationCompat.Builder(this, channelId)
+                      .setContentTitle("虚拟屏挂机运行中")
+                      .setContentText("Scrcpy + Shizuku 虚拟显示器正在后台保持游戏运行")
+                      .setSmallIcon(android.R.drawable.ic_menu_view)
+                      .setOngoing(true)
+                      .build()
+              }
+
+              override fun onDestroy() {
+                  stopVirtualDisplayAndCleanup()
+                  super.onDestroy()
+              }
+          }
+          EOF_KT
+
+          cat <<'EOF_MANIFEST' > android/app/src/main/AndroidManifest.xml
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+              <application
+                  android:label="Scrcpy虚拟屏挂机"
+                  android:name="${applicationName}"
+                  android:icon="@mipmap/ic_launcher">
+
+                  <activity
+                      android:name=".MainActivity"
+                      android:exported="true"
+                      android:launchMode="singleTop"
+                      android:theme="@style/LaunchTheme"
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                      android:hardwareAccelerated="true"
+                      android:windowSoftInputMode="adjustResize">
+                      <meta-data
+                          android:name="io.flutter.embedding.android.NormalTheme"
+                          android:resource="@style/NormalTheme" />
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+
+                  <provider
+                      android:name="rikka.shizuku.ShizukuProvider"
+                      android:authorities="${applicationId}.shizuku"
+                      android:enabled="true"
+                      android:exported="true"
+                      android:multiprocess="false"
+                      android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+                  <service
+                      android:name=".FloatingScrcpyService"
+                      android:enabled="true"
+                      android:exported="false"
+                      android:foregroundServiceType="specialUse">
+                      <property
+                          android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                          android:value="virtual_display_game_afk_streaming" />
+                  </service>
+
+                  <meta-data
+                      android:name="flutterEmbedding"
+                      android:value="2" />
+              </application>
+          </manifest>
+          EOF_MANIFEST
+
+          rm -f android/app/build.gradle
+          cat <<'EOF_GRADLE' > android/app/build.gradle.kts
+          plugins {
+              id("com.android.application")
+              id("kotlin-android")
+              id("dev.flutter.flutter-gradle-plugin")
+          }
+
+          android {
+              namespace = "com.example.scrcpy_afk"
+              compileSdk = 35
+
+              compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_17
+                  targetCompatibility = JavaVersion.VERSION_17
+              }
+
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+
+              defaultConfig {
+                  applicationId = "com.example.scrcpy_afk"
+                  minSdk = 26
+                  targetSdk = 35
+                  versionCode = 1
+                  versionName = "1.0.0"
+              }
+
+              buildTypes {
+                  release {
+                      signingConfig = signingConfigs.getByName("debug")
+                      isMinifyEnabled = false
+                      isShrinkResources = false
+                  }
+              }
+          }
+
+          flutter {
+              source = "../.."
+          }
+
+          dependencies {
+              implementation("androidx.core:core-ktx:1.12.0")
+              implementation("dev.rikka.shizuku:api:13.1.5")
+              implementation("dev.rikka.shizuku:provider:13.1.5")
+          }
+          EOF_GRADLE
+
+          mkdir -p android/app/src/main/assets
+          curl -L https://github.com/Genymobile/scrcpy/releases/download/v2.4/scrcpy-server-v2.4 \
+            -o android/app/src/main/assets/scrcpy-server
+
+          flutter pub get
+          flutter build apk --release
+
+      - name: Upload Compiled APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrcpy-afk-release-apk
+          path: scrcpy_afk_build/build/app/outputs/flutter-apk/app-release.apk
